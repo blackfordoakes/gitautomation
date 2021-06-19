@@ -26,6 +26,7 @@ class GitReleaser:
         
         print ("Tagging current revision with: " + new_tag)
         created_tag = repo.create_tag(new_tag)
+        repo.remotes.origin.push(created_tag)
 
         # if the QA tag exists, move it
         qa_tag = None
@@ -40,9 +41,6 @@ class GitReleaser:
             repo.remotes.origin.push(refspec=(':%s' % (qa_tag))) # remove remote
 
         qa_tag = repo.create_tag("qa")
-
-        # push tags to remote
-        repo.remotes.origin.push(created_tag)
         repo.remotes.origin.push(qa_tag)
 
 
