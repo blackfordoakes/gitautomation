@@ -25,7 +25,7 @@ class GitReleaser:
             return
         
         print ("Tagging current revision with: " + new_tag)
-        repo.create_tag(new_tag)
+        created_tag = repo.create_tag(new_tag)
 
         # if the QA tag exists, move it
         qa_tag = None
@@ -37,8 +37,14 @@ class GitReleaser:
         if qa_tag:
             print("moving the qa tag")
             repo.delete_tag(qa_tag)
+            repo.remotes.origin.push(qa_tag)
 
-        repo.create_tag("qa")
+        qa_tag = repo.create_tag("qa")
+
+        # push tags to remote
+        repo.remotes.origin.push(created_tag)
+        repo.remotes.origin.push(qa_tag)
+
 
 if __name__ == "__main__":
     objName = GitReleaser()
