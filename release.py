@@ -5,21 +5,17 @@ def prepare_release():
     repo = Repo()
     assert not repo.bare
     
-    # get the current tag
-    print ("Current tags:")
-    tags = repo.tags
-    for tag in tags:
-        print (tag)
+    # suggest a tag
+    suggested_tag = suggest_version(repo.tags)
     
     # ask user for new tag
-    new_tag = input("Please enter the version number: ")
+    new_tag = input("Please enter the version number (ENTER for " + suggested_tag + "): ")
     new_tag = new_tag.lower().strip()
 
     if not new_tag:
-        print ("No version entered.")
-        return
+        new_tag = suggested_tag
 
-    created_tag = find_tag(new_tag, tags)
+    created_tag = find_tag(new_tag, repo.tags)
     if created_tag:
         print("Tag already exists")
         return
@@ -29,7 +25,7 @@ def prepare_release():
     repo.remotes.origin.push(created_tag)
 
     # if the QA tag exists, move it
-    qa_tag = find_tag("qa", tags)
+    qa_tag = find_tag("qa", repo.tags)
     if qa_tag:
         print("Moving the qa tag")
         repo.delete_tag(qa_tag) # remove local
@@ -46,6 +42,26 @@ def find_tag(tag_name, taglist):
             break
     
     return found_tag
+
+def suggest_version(tagList):
+    suggestion = "0.0.1"
+    try:
+        last = tagList[-1]
+        suggestion = last.name
+
+        if suggestion == "qa":
+            last = tagList[-2]
+            suggestion = last.name
+        
+        print("Latest tag is: " + suggestion)
+        parts = suggestion.split(".")
+        incremented = int(parts[-1]) + 1
+        parts[-1] = str(incremented)
+        suggestion = ".".join(parts)
+    except:
+       suggestion = "0.0.1"
+
+    return suggestion
 
 if __name__ == "__main__":
     prepare_release()
