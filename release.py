@@ -36,8 +36,8 @@ class GitReleaser:
 
         if qa_tag:
             print("moving the qa tag")
-            repo.delete_tag(qa_tag)
-            repo.remotes.origin.push(qa_tag)
+            repo.delete_tag(qa_tag) # remove local
+            repo.remotes.origin.push(refspec=(':%s' % (qa_tag))) # remove remote
 
         qa_tag = repo.create_tag("qa")
 
