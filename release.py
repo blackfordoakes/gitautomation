@@ -11,7 +11,7 @@ class GitReleaser:
         assert not repo.bare
         
         # get the current tag
-        print ("current tags:")
+        print ("Current tags:")
         tags = repo.tags
         for tag in tags:
             print (tag)
